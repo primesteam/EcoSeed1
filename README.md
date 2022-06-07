@@ -1,7 +1,7 @@
 # EcoSeed
 Every plant needs a someone to keep an eye on it. Or maybe something? EcoSeed is a eco friendly system that takes good care of your plant and notifies you about its growth progress.
-![logo-new](https://user-images.githubusercontent.com/71717457/172488299-8806ea04-cc92-4af0-a666-15fdc0f39026.png)
 
+![logo-new](https://user-images.githubusercontent.com/71717457/172488299-8806ea04-cc92-4af0-a666-15fdc0f39026.png)
 # Main Idea
 Our idea is a system that will monitor a plant (its height, weight and soil) and also rotate it to a specific position where the amount of light is as much as possible. After that, we collect these information and upload them in a PHP database. To do this, we needed to learn some new things about the components that we used and also the way we wanted them to work.
 
