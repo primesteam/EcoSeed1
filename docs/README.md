@@ -380,7 +380,7 @@ void wifi_led() {
 ### _Create Function and Clear LCD Screen_
 
 ```cpp
-void lcd_test(){
+void lcd_stats(){
   lcd.clear();
 ```
 
