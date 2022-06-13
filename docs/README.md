@@ -3,10 +3,10 @@
 * <a href="#main-file">Main File</a>
 * <a href="#declare_location-function">declare_location()</a>
 * <a href="#declare_post-function">data_post()</a>
-* <a href="#wifi">wifi_led()</a>
-* <a href="#lcd">lcd_stats()</a>
-* <a href="#moisture">moisture()</a>
-* <a href="#ultra">get_distance()</a>
+* <a href="#wifi_led-function">wifi_led()</a>
+* <a href="#lcd_stats-function">lcd_stats()</a>
+* <a href="#moisture-fuction">moisture()</a>
+* <a href="#get_distance-function">get_distance()</a>
 ## Main File
 ### _Include Project Libraries_
 
