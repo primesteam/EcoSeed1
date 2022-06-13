@@ -1,6 +1,13 @@
 # Code Explanation
-
-## project.ino
+## Files
+* <a href="main">Main File</a>
+* <a href="location">declare_location()</a>
+* <a href="post">data_post()</a>
+* <a href="wifi">wifi_led()</a>
+* <a href="lcd">lcd_stats()</a>
+* <a href="moisture">moisture()</a>
+* <a href="ultra">get_distance()</a>
+## <p id="main">Main File</p>
 ### _Include Project Libraries_
 
 ```cpp
@@ -122,7 +129,7 @@ void setup() {
   // 2st Stepper Speed
   plantStepper.setSpeed(10);
 ```
-#### Begin WiFi and Check for its Status
+#### Begin Wi-Fi and Check for its Status
 ```cpp
   WiFi.begin(ssid, password);
   Serial.println("Connecting");
@@ -171,7 +178,7 @@ void loop() {
 }
 ```
 
-## declare_location Function
+## <p id="location">declare_location Function</p>
 ### _Define Variables_
 ```cpp
 int stops = 10;
@@ -228,6 +235,7 @@ void declare_location() {
 ```cpp
 }
 ```
+## <p id="post">data_post Function</p>
 ## data_post Function
 ### _Define Variables_
 ```cpp
@@ -235,13 +243,13 @@ int logged = 0;
 ```
 ### _Create Function_
 ```cpp
-void send_data() {
+void data_post() {
 ```
-### _Check if its the time to post data_
+### _Check if it's the time to post data_
 ```cpp
   if (now.hour() % 2 == 0 and logged == 0) {
 ```
-### _Check for WiFi_
+### _Check for Wi-Fi_
 ```cpp
     if (WiFi.status() == WL_CONNECTED) {
 ```
@@ -274,7 +282,7 @@ void send_data() {
       http.end();
     }
 ```
-### _WiFi Disconnected_
+### _Wi-Fi Disconnected_
 ```cpp
     else {
       Serial.println("WiFi Disconnected");
