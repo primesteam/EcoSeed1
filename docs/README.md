@@ -343,7 +343,7 @@ String moisture() {
   value = map(value, 4095, 1500, 0, 100);
   return String(value);
 ```
-  ### _Close Function_
+### _Close Function_
 ```cpp
 }
 ```
