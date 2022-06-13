@@ -1,6 +1,7 @@
 # Code Explanation
 
-Include Project Libraries
+## project.ino
+### _Include Project Libraries_
 
 ```cpp
 #include <Stepper.h> // Stepper Library
@@ -11,14 +12,14 @@ Include Project Libraries
 #include "RTClib.h" // RTClib Library
 ```
 
-Define RTC
+### _Define RTC_
 
 ```cpp
 RTC_DS3231 rtc; // Define RTC
 DateTime now; // ESP32 Time
 ```
 
-Define WiFi Settings
+### _Define WiFi Settings_
 
 ```cpp
 // WiFi
@@ -27,7 +28,7 @@ const char* password = ""; // Password for the WiFi
 const char* serverName = ""; // Define the Server for the data
 ```
 
-Define Component Pins
+### _Define Component Pins_
 
 ```cpp
 // Ldr Sensor
@@ -39,7 +40,7 @@ int sensor_pin = 34; // Moisture Sensor Pin
 // Force Sensor
 const int forcePin = 32; // Force Sensor Pin
 
-//Ultrasonic Sensor
+// Ultrasonic Sensor
 const int trigPin = 33; // Trigger Pin
 const int echoPin = 25; // Echo Pin
 #define SOUND_SPEED 0.034 // Sound Speed
@@ -51,7 +52,7 @@ const int led = 26; // LED Pin
 const int relayPin = 2; // Relay Pin
 ```
 
-Create LCD
+### _Create LCD_
 
 ```cpp
 // Lcd I2c
@@ -60,7 +61,7 @@ const int lcdRows = 2; // Define the Number of Rows for the LCD
 LiquidCrystal_I2C lcd(0x27, lcdColumns, lcdRows); // Create the LCD
 ```
 
-Create Stepper
+### _Create Stepper_
 
 ```cpp
 // Steppers
@@ -78,34 +79,34 @@ Stepper ldrStepper(stepsPerRevolution, S1IN1, S1IN3, S1IN2, S1IN4); // Create 1s
 Stepper plantStepper(stepsPerRevolution, S2IN1, S2IN3, S2IN2, S2IN4); // Create 2st Stepper
 ```
 
-Open Setup Function
+### _Open Setup Function_
 
 ```cpp
 void setup() {
 ```
-Begin Serial
+#### Begin Serial
 ```cpp
   Serial.begin(115200);
 ```
-Start LCD
+#### Start LCD
 ```cpp
   lcd.init();
 ```
-Enable Backlight of LCD
+#### Enable Backlight of LCD
 ```cpp
   lcd.backlight();
 ```
-Show Welcome Text on LCD
+#### Show Welcome Text on LCD
 ```cpp
   welcome();
 ```
-Check RTC Module
+#### Check RTC Module
 ```cpp
   if (! rtc.begin()) {
     Serial.println("Couldn't find RTC");
   }
 ```
-Set Pin Modes
+#### Set Pin Modes
 ```cpp
   // LED Mode
   pinMode(led, OUTPUT);
@@ -114,14 +115,14 @@ Set Pin Modes
   // Echo Mode
   pinMode(echoPin, INPUT);
 ```
-Set Steppers' Speeds
+#### Set Steppers' Speeds
 ```cpp
   // 1st Stepper Speed
   ldrStepper.setSpeed(10);
   // 2st Stepper Speed
   plantStepper.setSpeed(10);
 ```
-Begin WiFi and Check for its Status
+#### Begin WiFi and Check for its Status
 ```cpp
   WiFi.begin(ssid, password);
   Serial.println("Connecting");
@@ -130,60 +131,162 @@ Begin WiFi and Check for its Status
     Serial.print(".");
   }
 ```
-Print the IP of the ESP32 to the Console
+#### Print the IP of the ESP32 to the Console
 ```cpp
   Serial.println("");
   Serial.print("Connected to WiFi network with IP Address: ");
   Serial.println(WiFi.localIP());
 ```
-Adjust System Time
+#### Adjust System Time and Close Setup Function
 ```cpp
   rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
-```
-Close Setup Function
-```cpp
 }
 ```
 
-Open Loop Function
+### _Open Loop Function_
 
 ```cpp
 void loop() {
 ```
 
-Define ESP32 time through RTC
+#### Define ESP32 time through RTC
 
 ```cpp
   now = rtc.now();
 ```
 
-Call declare_location Function
+#### Call Functions
 
 ```cpp
   declare_location();
-```
-
-Call data_post Function
-
-```cpp
   data_post();
-```
-
-Call wifi_led Function
-
-```cpp
   wifi_led();
-```
-
-Call lcd_stats Function
-
-```cpp
   lcd_stats();
 ```
 
-Wait 1 Second and Close Loop Function
+#### Wait 1 Second and Close Loop Function
 
 ```cpp
   delay(1000);
+}
+```
+
+## declare_location Function
+### _Define Variables_
+```cpp
+int stops = 10;
+int ldrmax = 0;
+int steppos = 0;
+int current = 0;
+```
+### _Create Function_
+```cpp
+void declare_location() {
+```
+### _Rotate 1st Stepper Clockwise_
+```cpp
+  for (int i = 0; i < (stops / 2 + 1); i++) {
+    int l = analogRead(ldrPin); // Get LDR Value
+    if (l > ldrmax) { // Check if the value is greater that the variable
+      ldrmax = l; // Save value
+      steppos = (stepsPerRevolution / stops) * i; // Save position
+    }
+    ldrStepper.step(stepsPerRevolution / stops); // Turn Stepper One Step
+    delay(500);
+  }
+  ldrStepper.step(-(stepsPerRevolution / stops) * 5); // Return Stepper to its original position
+```
+### _Rotate 1st Stepper Counterclockwise_
+```cpp
+  for (int i = 0; i < (stops / 2 + 1); i++) {
+    int l = analogRead(ldrPin); // Get LDR Value
+    if (l > ldrmax) { // Check if the value is greater that the variable
+      ldrmax = l; // Save value
+      steppos = (-stepsPerRevolution / stops) * i; // Save position
+    }
+    ldrStepper.step(-stepsPerRevolution / stops); // Turn Stepper One Step
+    delay(500);
+  }
+  ldrStepper.step((stepsPerRevolution / stops) * 5); // Return Stepper to its original position
+```
+### _Turn 2nd Stepper For the First Time_
+```cpp
+  if (current == 0) {
+    plantStepper.step(steppos * 1.8);
+    current = steppos * 1.8;
+  } 
+```
+### _Turn 2nd Stepper_
+```cpp
+  else {
+    plantStepper.step(-current);
+    current = steppos * 1.8;
+    plantStepper.step(steppos * 1.8);
+  }
+```
+### _Close Function_
+```cpp
+}
+```
+## data_post Function
+### _Define Variables_
+```cpp
+int logged = 0;
+```
+### _Create Function_
+```cpp
+void send_data() {
+```
+### _Check if its the time to post data_
+```cpp
+  if (now.hour() % 2 == 0 and logged == 0) {
+```
+### _Check for WiFi_
+```cpp
+    if (WiFi.status() == WL_CONNECTED) {
+```
+### _Define Clients_
+```cpp
+      WiFiClient client;
+      HTTPClient http;
+```
+### _Begin HTTP Server_
+```cpp
+      http.begin(client, serverName);
+```
+### _Define Strings_
+```cpp
+      String weight = "weight=" + String(analogRead(forcePin));
+      String humidity = "humidity=" + moisture();
+      String height = "height=" + get_distance();
+```
+### _Define Request Data_
+```cpp
+      http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+      String httpRequestData = humidity + "&" + height + "&" + weight;
+      int httpResponseCode = http.POST(httpRequestData);
+```
+### _Print Responce Code to Console_
+```cpp
+      Serial.print("HTTP Response code: ");
+      Serial.println(httpResponseCode);
+      logged = 1;
+      http.end();
+    }
+```
+### _WiFi Disconnected_
+```cpp
+    else {
+      Serial.println("WiFi Disconnected");
+    }
+```
+### _Check for Odd Hour_
+```cpp
+  } else if (now.hour() % 2 == 1) {
+    logged = 0;
+  }
+```
+### _Close Function_
+```cpp
 }
 ```
