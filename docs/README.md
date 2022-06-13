@@ -1,13 +1,13 @@
 # Code Explanation
 ## Files
-* <a href="main">Main File</a>
-* <a href="location">declare_location()</a>
-* <a href="post">data_post()</a>
-* <a href="wifi">wifi_led()</a>
-* <a href="lcd">lcd_stats()</a>
-* <a href="moisture">moisture()</a>
-* <a href="ultra">get_distance()</a>
-## <p id="main">Main File</p>
+* <a href="#main-file">Main File</a>
+* <a href="#declare_location-function">declare_location()</a>
+* <a href="#declare_post-function">data_post()</a>
+* <a href="#wifi">wifi_led()</a>
+* <a href="#lcd">lcd_stats()</a>
+* <a href="#moisture">moisture()</a>
+* <a href="#ultra">get_distance()</a>
+## Main File
 ### _Include Project Libraries_
 
 ```cpp
@@ -32,7 +32,7 @@ DateTime now; // ESP32 Time
 // WiFi
 const char* ssid = ""; // SSID for the WiFi
 const char* password = ""; // Password for the WiFi
-const char* serverName = ""; // Define the Server for the data
+const char* serverName = "ecoseed**.com"; // Define the Server for the data
 ```
 
 ### _Define Component Pins_
@@ -236,7 +236,6 @@ void declare_location() {
 }
 ```
 ## <p id="post">data_post Function</p>
-## data_post Function
 ### _Define Variables_
 ```cpp
 int logged = 0;
@@ -296,5 +295,76 @@ void data_post() {
 ```
 ### _Close Function_
 ```cpp
+}
+```
+## wifi_led Function
+### _Create Function and blink the led_
+```cpp
+void wifi_led() {
+  digitalWrite(led, HIGH);
+  delay(500);
+  digitalWrite(led, LOW);
+  delay(500);
+}
+```
+## lcd_stats Function
+### _Create Function and Clear LCD Screen_
+```cpp
+void lcd_test(){
+  lcd.clear();
+```
+### _Set Cursor and write the Weight_
+```cpp
+  lcd.setCursor(0, 0);
+  lcd.print("W: " + String(analogRead(forcePin)));
+```
+### _Set Cursor and Write the Humidity_
+```cpp
+  lcd.setCursor(8,0);
+  lcd.print("H: " + moisture() + "%");
+```
+### _Set Cursor and Write the Height_
+```cpp
+  lcd.setCursor(0,1);
+  lcd.print("H: " + get_distance() + "cm");
+```
+### _Close Function_
+```cpp
+}
+```
+## moisture Function
+### _Create Function_
+```cpp
+String moisture() {
+```
+### _Get sensor value and Convert it to percentage_
+```cpp
+  int value = analogRead(sensor_pin);
+  value = map(value, 4095, 1500, 0, 100);
+  return String(value);
+```
+  ### _Close Function_
+```cpp
+}
+```
+## get_distance Function
+### _Create Function_
+```cpp
+String get_distance() {
+```
+### _Write Ultrasonic Sensor Pins_
+```cpp
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+```
+### _Measure Sensor Values_
+```cpp
+  long duration = pulseIn(echoPin, HIGH);
+  float distanceCm = duration * SOUND_SPEED / 2;
+  return String(distanceCm);
 }
 ```
