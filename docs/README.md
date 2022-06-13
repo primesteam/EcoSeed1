@@ -178,7 +178,7 @@ void loop() {
 }
 ```
 
-## <p id="location">declare_location Function</p>
+## declare_location Function
 ### _Define Variables_
 ```cpp
 int stops = 10;
@@ -235,7 +235,7 @@ void declare_location() {
 ```cpp
 }
 ```
-## <p id="post">data_post Function</p>
+## data_post Function
 ### _Define Variables_
 ```cpp
 int logged = 0;
