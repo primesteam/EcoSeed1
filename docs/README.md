@@ -1,13 +1,18 @@
 # Code Explanation
+
 ## Files
+
 * <a href="#main-file">Main File</a>
 * <a href="#declare_location-function">declare_location()</a>
 * <a href="#data_post-function">data_post()</a>
 * <a href="#wifi_led-function">wifi_led()</a>
 * <a href="#lcd_stats-function">lcd_stats()</a>
+* <a href="#lcd_welcome-function">lcd_welcome()</a>
 * <a href="#moisture-function">moisture()</a>
 * <a href="#get_distance-function">get_distance()</a>
+
 ## Main File
+
 ### _Include Project Libraries_
 
 ```cpp
@@ -91,29 +96,41 @@ Stepper plantStepper(stepsPerRevolution, S2IN1, S2IN3, S2IN2, S2IN4); // Create 
 ```cpp
 void setup() {
 ```
+
 #### Begin Serial
+
 ```cpp
   Serial.begin(115200);
 ```
+
 #### Start LCD
+
 ```cpp
   lcd.init();
 ```
+
 #### Enable Backlight of LCD
+
 ```cpp
   lcd.backlight();
 ```
+
 #### Show Welcome Text on LCD
+
 ```cpp
-  welcome();
+  lcd_welcome();
 ```
+
 #### Check RTC Module
+
 ```cpp
   if (! rtc.begin()) {
     Serial.println("Couldn't find RTC");
   }
 ```
+
 #### Set Pin Modes
+
 ```cpp
   // LED Mode
   pinMode(led, OUTPUT);
@@ -122,14 +139,18 @@ void setup() {
   // Echo Mode
   pinMode(echoPin, INPUT);
 ```
+
 #### Set Steppers' Speeds
+
 ```cpp
   // 1st Stepper Speed
   ldrStepper.setSpeed(10);
   // 2st Stepper Speed
   plantStepper.setSpeed(10);
 ```
+
 #### Begin Wi-Fi and Check for its Status
+
 ```cpp
   WiFi.begin(ssid, password);
   Serial.println("Connecting");
@@ -138,13 +159,17 @@ void setup() {
     Serial.print(".");
   }
 ```
+
 #### Print the IP of the ESP32 to the Console
+
 ```cpp
   Serial.println("");
   Serial.print("Connected to WiFi network with IP Address: ");
   Serial.println(WiFi.localIP());
 ```
+
 #### Adjust System Time and Close Setup Function
+
 ```cpp
   rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 }
@@ -179,18 +204,24 @@ void loop() {
 ```
 
 ## declare_location Function
+
 ### _Define Variables_
+
 ```cpp
 int stops = 10;
 int ldrmax = 0;
 int steppos = 0;
 int current = 0;
 ```
+
 ### _Create Function_
+
 ```cpp
 void declare_location() {
 ```
+
 ### _Rotate 1st Stepper Clockwise_
+
 ```cpp
   for (int i = 0; i < (stops / 2 + 1); i++) {
     int l = analogRead(ldrPin); // Get LDR Value
@@ -203,7 +234,9 @@ void declare_location() {
   }
   ldrStepper.step(-(stepsPerRevolution / stops) * 5); // Return Stepper to its original position
 ```
+
 ### _Rotate 1st Stepper Counterclockwise_
+
 ```cpp
   for (int i = 0; i < (stops / 2 + 1); i++) {
     int l = analogRead(ldrPin); // Get LDR Value
@@ -216,14 +249,18 @@ void declare_location() {
   }
   ldrStepper.step((stepsPerRevolution / stops) * 5); // Return Stepper to its original position
 ```
+
 ### _Turn 2nd Stepper For the First Time_
+
 ```cpp
   if (current == 0) {
     plantStepper.step(steppos * 1.8);
     current = steppos * 1.8;
   } 
 ```
+
 ### _Turn 2nd Stepper_
+
 ```cpp
   else {
     plantStepper.step(-current);
@@ -231,49 +268,70 @@ void declare_location() {
     plantStepper.step(steppos * 1.8);
   }
 ```
+
 ### _Close Function_
+
 ```cpp
 }
 ```
+
 ## data_post Function
+
 ### _Define Variables_
+
 ```cpp
 int logged = 0;
 ```
+
 ### _Create Function_
+
 ```cpp
 void data_post() {
 ```
+
 ### _Check if it's the time to post data_
+
 ```cpp
   if (now.hour() % 2 == 0 and logged == 0) {
 ```
+
 ### _Check for Wi-Fi_
+
 ```cpp
     if (WiFi.status() == WL_CONNECTED) {
 ```
+
 ### _Define Clients_
+
 ```cpp
       WiFiClient client;
       HTTPClient http;
 ```
+
 ### _Begin HTTP Server_
+
 ```cpp
       http.begin(client, serverName);
 ```
+
 ### _Define Strings_
+
 ```cpp
       String weight = "weight=" + String(analogRead(forcePin));
       String humidity = "humidity=" + moisture();
       String height = "height=" + get_distance();
 ```
+
 ### _Define Request Data_
+
 ```cpp
       http.addHeader("Content-Type", "application/x-www-form-urlencoded");
       String httpRequestData = humidity + "&" + height + "&" + weight;
       int httpResponseCode = http.POST(httpRequestData);
 ```
+
 ### _Print Responce Code to Console_
+
 ```cpp
       Serial.print("HTTP Response code: ");
       Serial.println(httpResponseCode);
@@ -281,24 +339,33 @@ void data_post() {
       http.end();
     }
 ```
+
 ### _Wi-Fi Disconnected_
+
 ```cpp
     else {
       Serial.println("WiFi Disconnected");
     }
 ```
+
 ### _Check for Odd Hour_
+
 ```cpp
   } else if (now.hour() % 2 == 1) {
     logged = 0;
   }
 ```
+
 ### _Close Function_
+
 ```cpp
 }
 ```
+
 ## wifi_led Function
+
 ### _Create Function and blink the led_
+
 ```cpp
 void wifi_led() {
   digitalWrite(led, HIGH);
@@ -307,52 +374,100 @@ void wifi_led() {
   delay(500);
 }
 ```
+
 ## lcd_stats Function
+
 ### _Create Function and Clear LCD Screen_
+
 ```cpp
 void lcd_test(){
   lcd.clear();
 ```
+
 ### _Set Cursor and write the Weight_
+
 ```cpp
   lcd.setCursor(0, 0);
   lcd.print("W: " + String(analogRead(forcePin)));
 ```
+
 ### _Set Cursor and Write the Humidity_
+
 ```cpp
   lcd.setCursor(8,0);
   lcd.print("H: " + moisture() + "%");
 ```
+
 ### _Set Cursor and Write the Height_
+
 ```cpp
   lcd.setCursor(0,1);
   lcd.print("H: " + get_distance() + "cm");
 ```
+
 ### _Close Function_
+
 ```cpp
 }
 ```
+
+## lcd_welcome Function
+
+### _Create Function and Clear LCD Screen_
+
+```cpp
+void lcd_welcome() {
+  lcd.clear();
+```
+
+### _Set Cursor and Write Text_
+
+```cpp
+  lcd.setCursor(4, 0);
+  lcd.print("Eco Seed");
+  lcd.setCursor(3, 1);
+  lcd.print("Initialize");
+  delay(1000);
+```
+
+### _Close Function_
+
+```cpp
+}
+```
+
 ## moisture Function
+
 ### _Create Function_
+
 ```cpp
 String moisture() {
 ```
+
 ### _Get sensor value and Convert it to percentage_
+
 ```cpp
   int value = analogRead(sensor_pin);
   value = map(value, 4095, 1500, 0, 100);
   return String(value);
 ```
+
 ### _Close Function_
+
 ```cpp
 }
 ```
+
 ## get_distance Function
+
 ### _Create Function_
+
 ```cpp
 String get_distance() {
 ```
+
 ### _Write Ultrasonic Sensor Pins_
+
 ```cpp
   digitalWrite(trigPin, LOW);
   delayMicroseconds(2);
@@ -361,7 +476,9 @@ String get_distance() {
   digitalWrite(trigPin, LOW);
 
 ```
+
 ### _Measure Sensor Values_
+
 ```cpp
   long duration = pulseIn(echoPin, HIGH);
   float distanceCm = duration * SOUND_SPEED / 2;
