@@ -9,9 +9,9 @@ RTC_DS3231 rtc; // Define RTC
 DateTime now; // ESP32 Time
 
 // WiFi
-const char* ssid = "Sierra_Subnet"; // Define the SSID for the WiFi
-const char* password = "UUS57YQ4U4"; // Define the Password for the WiFi
-const char* serverName = "http://ecoseed.ioannistzagarakis.com/insert.php"; // Define the Server for the data
+const char* ssid = ""; // Define the SSID for the WiFi
+const char* password = ""; // Define the Password for the WiFi
+const char* serverName = "ecoseed**.com"; // Define the Server for the data
 
 // Ldr Sensor
 const int ldrPin = 4; // LDR Sensor Pin
