@@ -5,7 +5,7 @@
 * <a href="#data_post-function">data_post()</a>
 * <a href="#wifi_led-function">wifi_led()</a>
 * <a href="#lcd_stats-function">lcd_stats()</a>
-* <a href="#moisture-fuction">moisture()</a>
+* <a href="#moisture-function">moisture()</a>
 * <a href="#get_distance-function">get_distance()</a>
 ## Main File
 ### _Include Project Libraries_
